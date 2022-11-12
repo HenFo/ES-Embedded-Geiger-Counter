@@ -20,4 +20,4 @@ Hinweis: Für einen GPS-Empfang sollte das Gerät unter freiem Himmel liegen. We
 - TinyGPS
 
 ## Ergebnis
-![serial-output](.\serial-output.png)
+![serial-output](https://github.com/HenFo/ES-Embedded-Geiger-Counter/blob/main/nucleo-gps/serial-output.png)
