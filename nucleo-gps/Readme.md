@@ -16,6 +16,7 @@ Hinweis: Für einen GPS-Empfang sollte das Gerät unter freiem Himmel liegen. We
 
 ## benötigte Libraries
 - Nutzung der Arduino IDE für Nucleo: https://www.instructables.com/Quick-Start-to-STM-Nucleo-on-Arduino-IDE/
+  - Neuer Link für den BoardManager: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
 - SoftwareSerial
 - TinyGPS
 
