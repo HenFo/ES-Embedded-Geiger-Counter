@@ -5,26 +5,25 @@ TinyGPSPlus gps;
 
 boolean connected = false;
 // Die serielle Verbindung zum GPS Modul
-SoftwareSerial gpsSerial(3, 4);
+SoftwareSerial gpsSerial(PA9, PA10);
 
-SoftwareSerial loraSerial(7, 6);
+SoftwareSerial loraSerial(PA2, PA3);
 
-const String AppKey = "2C11FE5BED9F7936C00FA46A7A4F8991";
+const String AppKey = "CDAE2B1CCAE402758B6E5CB59D06580D";
 const String DR = "EU868";
 
+uint counter = 0;
+unsigned long lastCount;
+
 void setup() {
-  Serial.begin(115200);
+  lastCount = millis();
+  pinMode(PC7, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PC7), callback, FALLING); 
+   
   gpsSerial.begin(9600);
   loraSerial.begin(9600);
   
-  
-  //Join lora network
-
-  resetLora();
-  
   setLoraConfigOTAA();
-
-  //printLoraConfig();
   
   joinLoraNetwork();
   
@@ -33,11 +32,16 @@ void setup() {
 void loop() {
   
   String s = getMessage();
-  Serial.println(s);
-  
   sendLoraMessage(s);
-  Serial.println("");
-  delay(10000);
+  delay(3000);
+}
+
+void callback(){
+  unsigned long newCount = millis();
+  if (newCount > lastCount + 100){
+    counter ++;
+    lastCount = newCount;
+  }
 }
 
 String getMessage()
@@ -50,7 +54,7 @@ String getMessage()
   String satString = String(gps.satellites.value());
   String dateString = String(gps.date.value());
   String timeString = String(gps.time.value());
-  String measureString = "20";
+  String measureString = String(counter);
   
   String msg = buildMessage(latString, longString, altString, satString, dateString, timeString, measureString);
   
@@ -89,10 +93,6 @@ void resetLora()
 {
   write(loraSerial, "AT+FDEFAULT");
   printLoraOutput(1000);
-
-  //loraSerial.write("AT+RESET");
-  //printLoraOutput(1000);
-
   delay(5000);
 }
 
@@ -128,10 +128,7 @@ void setLoraConfigOTAA()
 
   write(loraSerial, fill("AT+DR=%1", DR));
   printLoraOutput(1000);
-
-  //loraSerial.write("AT+CH=NUM,0-7");
-  //printLoraOutput(1000);
-
+  
   write(loraSerial, "AT+MODE=LWOTAA");
   printLoraOutput(1000);
 }
@@ -183,6 +180,7 @@ String fill(String base, String param1)
 
 void write(SoftwareSerial serial, String msg)
 {
+    msg += "\n";
     char p[msg.length()+1];
     msg.toCharArray(p, msg.length()+1);
     serial.write(p);
@@ -191,9 +189,10 @@ void write(SoftwareSerial serial, String msg)
 
 void print(String msg)
 {
-    char p[msg.length()+1];
-    msg.toCharArray(p, msg.length()+1);
-    Serial.write(p);
+    // char p[msg.length()+1];
+    // msg.toCharArray(p, msg.length()+1);
+    // Serial.write(p);
+    // write(gpsSerial, p);
 }
 
 String read(SoftwareSerial serial, unsigned long ms)
